@@ -1,184 +1,197 @@
 package eu.over9000.mazr.model;
 
-import eu.over9000.mazr.util.ConsoleOutUtil;
+import java.util.*;
+
 import javafx.geometry.Orientation;
 import javafx.geometry.Side;
 import javafx.util.Pair;
 
-import java.util.*;
+import eu.over9000.mazr.algorithm.BreadthFirstSearch;
+import eu.over9000.mazr.algorithm.Prim;
+import eu.over9000.mazr.util.ConsoleOutUtil;
 
 /**
  * Created by jan on 05.06.15.
  */
 public class Maze {
 
-    private final Node[][] nodes;
-    private final Edge[][] edges_ver;
-    private final Edge[][] edges_hor;
-    private final int width;
-    private final int height;
-    private final Set<Node> nodesSet;
-    private final Map<Node, Set<Edge>> edgesOfNode;
-    private final Map<Edge, Pair<Node, Node>> nodesOfEdge;
-    private final Random random;
+	private final Node[][] nodes;
+	private final Edge[][] edges_ver;
+	private final Edge[][] edges_hor;
+	private final int width;
+	private final int height;
+	private final Set<Node> nodesSet;
+	private final Map<Node, Set<Edge>> edgesOfNode;
+	private final Map<Edge, Pair<Node, Node>> nodesOfEdge;
+	private final Random random;
+	private final Node startNode;
+
+	public int getHeight() {
+		return height;
+	}
+
+	public int getWidth() {
+		return width;
+	}
+
+	public Map<Node, Set<Edge>> getEdgesOfNode() {
+		return edgesOfNode;
+	}
+
+	public Maze(int width, int height, long seed) {
+		nodesSet = new HashSet<>();
+		edgesOfNode = new HashMap<>();
+		nodesOfEdge = new HashMap<>();
+
+		this.height = height;
+		this.width = width;
+
+		random = new Random(seed);
+		edges_hor = new Edge[height][width - 1];
+		edges_ver = new Edge[height - 1][width];
+		nodes = new Node[height][width];
 
 
-    public int getHeight() {
-        return height;
-    }
+		// init edges hor
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width - 1; j++) {
+				edges_hor[i][j] = new Edge(j, i, random.nextFloat(), Orientation.HORIZONTAL);
+			}
+		}
+		// init edges ver
+		for (int i = 0; i < height - 1; i++) {
+			for (int j = 0; j < width; j++) {
+				edges_ver[i][j] = new Edge(j, i, random.nextFloat(), Orientation.VERTICAL);
+			}
+		}
 
-    public int getWidth() {
-        return width;
-    }
+		// init nodes
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				nodes[i][j] = new Node(j, i);
+			}
+		}
+
+		// populate maps
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				buildMapContents(nodes[i][j]);
+			}
+		}
+		buildEdgesMap();
 
 
-    public Map<Node, Set<Edge>> getEdgesOfNode() {
-        return edgesOfNode;
-    }
+		startNode = nodes[random.nextInt(height)][random.nextInt(width)];
 
-    public Maze(int width, int height, long seed) {
-        nodesSet = new HashSet<>();
-        edgesOfNode = new HashMap<>();
-        nodesOfEdge = new HashMap<>();
+	}
 
-        this.height = height;
-        this.width = width;
+	private void buildEdgesMap() {
+		edgesOfNode.forEach((node, edges) -> edges.forEach(edge -> {
+			if (!nodesOfEdge.containsKey(edge)) {
+				nodesOfEdge.put(edge, new Pair<>(node, null));
+			} else {
+				Pair<Node, Node> nodes = nodesOfEdge.get(edge);
+				if (!nodes.getKey().equals(node)) {
+					nodesOfEdge.put(edge, new Pair<>(nodes.getKey(), node));
+				}
+			}
+		}));
+	}
 
-        random = new Random(seed);
-        edges_hor = new Edge[height][width - 1];
-        edges_ver = new Edge[height - 1][width];
-        nodes = new Node[height][width];
+	public void printMaze() {
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				System.out.print(" [] ");
+				if ((j < width - 1)) {
+					System.out.print(String.format("%.2f", edges_hor[i][j].getWeight()) + " ");
+				}
+			}
+			System.out.println();
+			if ((i < height - 1)) {
+				for (int j = 0; j < width; j++) {
+					System.out.print(String.format("%.2f", edges_ver[i][j].getWeight()) + "     ");
+				}
+				System.out.println();
+			}
 
+		}
+		System.out.println();
+	}
 
-        // init edges hor
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width - 1; j++) {
-                edges_hor[i][j] = new Edge(j , i, random.nextFloat(), Orientation.HORIZONTAL);
-            }
-        }
-        // init edges ver
-        for (int i = 0; i < height - 1; i++) {
-            for (int j = 0; j < width; j++) {
-                edges_ver[i][j] = new Edge(j , i, random.nextFloat(), Orientation.VERTICAL);
-            }
-        }
+	public void printMST(Set<Edge> mst) {
+		Map<Node, EnumSet<Side>> sides = ConsoleOutUtil.buildSidesOfNode(edgesOfNode, mst);
 
-        // init nodes
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                nodes[i][j] = new Node(j, i);
-            }
-        }
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				System.out.print(ConsoleOutUtil.resolveChar(sides.get(nodes[i][j])));
+			}
+			System.out.println();
+		}
+		System.out.println();
+	}
 
-        // populate maps
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-               buildMapContents(nodes[i][j]);
-            }
-        }
-        buildEdgesMap();
+	public int[][] buildDistMap() {
+		int[][] result = new int[height][width];
 
-    }
+		final Map<Node, Integer> distances = BreadthFirstSearch.calculateDistance(startNode, edgesOfNode, nodesOfEdge, Prim.calculateMinimumSpanningTree(this));
 
-    private void buildEdgesMap() {
-        edgesOfNode.forEach((node, edges) -> {
-            edges.forEach(edge -> {
-                if (!nodesOfEdge.containsKey(edge)) {
-                    nodesOfEdge.put(edge, new Pair<>(node, null));
-                } else {
-                    Pair<Node, Node> nodes = nodesOfEdge.get(edge);
-                    if (!nodes.getKey().equals(node)) {
-                        nodesOfEdge.put(edge, new Pair<>(nodes.getKey(), node));
-                    }
-                }
-            });
-        });
-    }
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				result[i][j] = distances.get(nodes[i][j]);
+			}
+		}
 
-    public void printMaze() {
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                System.out.print(" [] ");
-                if ((j < width - 1)) {
-                    System.out.print(String.format("%.2f", edges_hor[i][j].getWeight()) + " ");
-                }
-            }
-            System.out.println();
-            if ((i < height - 1)) {
-                for (int j = 0; j < width; j++) {
-                    System.out.print(String.format("%.2f", edges_ver[i][j].getWeight()) + "     ");
-                }
-                System.out.println();
-            }
+		return result;
+	}
 
-        }
-        System.out.println();
-    }
+	private void buildMapContents(Node node) {
+		Set<Edge> edges = new HashSet<>();
 
-    public void printMST(Set<Edge> mst){
-        Map<Node, EnumSet<Side>> sides = ConsoleOutUtil.buildSidesOfNode(edgesOfNode, mst);
+		int above = node.getY() - 1;
+		int below = node.getY() + 1;
+		int left = node.getX() - 1;
+		int right = node.getX() + 1;
 
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                System.out.print(ConsoleOutUtil.resolveChar(sides.get(nodes[i][j])));
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
+		if (above >= 0) {
+			edges.add(this.edges_ver[above][node.getX()]);
+		}
+		if (below < height) {
+			edges.add(this.edges_ver[below - 1][node.getX()]);
+		}
+		if (left >= 0) {
+			edges.add(this.edges_hor[node.getY()][left]);
+		}
+		if (right < width) {
+			edges.add(this.edges_hor[node.getY()][right - 1]);
+		}
 
-    private void buildMapContents(Node node) {
-        Set<Edge> edges = new HashSet<>();
+		nodesSet.add(node);
+		edgesOfNode.put(node, edges);
+	}
 
-        int above = node.getY() - 1;
-        int below = node.getY() + 1;
-        int left = node.getX() - 1;
-        int right = node.getX() + 1;
+	public void printNodes() {
+		edgesOfNode.entrySet().forEach(e -> System.out.println(e.getKey() + "=" + e.getValue()));
+		System.out.println();
+	}
 
-        if (above >= 0) {
-            edges.add(this.edges_ver[above][node.getX()]);
-        }
-        if (below < height) {
-            edges.add(this.edges_ver[below-1][node.getX()]);
-        }
-        if (left >= 0) {
-            edges.add(this.edges_hor[node.getY()][left]);
-        }
-        if (right < width) {
-            edges.add(this.edges_hor[node.getY()][right-1]);
-        }
+	public Node getStartNode() {
+		return startNode;
+	}
 
-        nodesSet.add(node);
-        edgesOfNode.put(node, edges);
-    }
+	public Node getEdgeSource(Edge edge) {
+		return nodesOfEdge.get(edge).getKey();
+	}
 
-    public void printNodes() {
-        edgesOfNode.entrySet().forEach(e -> {
-            System.out.println(e.getKey() + "=" + e.getValue());
-        });
-        System.out.println();
-    }
+	public Node getEdgeTarget(Edge edge) {
+		return nodesOfEdge.get(edge).getValue();
+	}
 
-    public Node getStartNode() {
-        return nodes[random.nextInt(height)][random.nextInt(width)];
-    }
+	public void printEdges() {
+		nodesOfEdge.entrySet().forEach(e -> System.out.println(e.getKey() + "=" + e.getValue()));
+		System.out.println();
+	}
 
-    public Node getEdgeSource(Edge edge) {
-       return nodesOfEdge.get(edge).getKey();
-    }
-
-    public Node getEdgeTarget(Edge edge) {
-        return nodesOfEdge.get(edge).getValue();
-    }
-
-    public void printEdges() {
-        nodesOfEdge.entrySet().forEach(e ->{
-            System.out.println(e.getKey() +"=" + e.getValue());
-        });
-        System.out.println();
-    }
-
-    public Set<Node> getNodes() {
-        return nodesSet;
-    }
+	public Set<Node> getNodes() {
+		return nodesSet;
+	}
 }

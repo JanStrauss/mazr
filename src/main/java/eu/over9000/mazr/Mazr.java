@@ -1,28 +1,53 @@
 package eu.over9000.mazr;
 
-import eu.over9000.mazr.model.Edge;
-import eu.over9000.mazr.model.Maze;
-import eu.over9000.mazr.prim.Prim;
+import javafx.application.Application;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
-import java.util.Set;
+import eu.over9000.mazr.model.Maze;
 
 /**
  * Created by jan on 05.06.15.
  */
-public class Mazr {
+public class Mazr extends Application {
 
-    public static void main(String[] args) {
-        Maze m = new Maze(128,16, 1337);
-        //m.printMaze();
-        //m.printAdjacency();
-        //m.printNodes();
-        //m.printEdges();
-        Set<Edge> mst = Prim.calculateMinimumSpanningTree(m);
+	public static void main(String[] args) {
+		Application.launch(args);
+	}
 
-       // System.out.println(mst);
+	@Override
+	public void start(final Stage stage) throws Exception {
+		final int width = 1280;
+		final int height = 720;
 
-        m.printMST(mst);
-    }
+		WritableImage img = new WritableImage(width, height);
+		PixelWriter pw = img.getPixelWriter();
+
+		Maze m = new Maze(width, height, 1337);
+		final int[][] distMap = m.buildDistMap();
 
 
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+
+				int val = distMap[y][x];
+				pw.setColor(x, y, Color.hsb(val * 0.25 % 360, 1, 1));
+			}
+		}
+
+		ImageView imageView = new ImageView(img);
+		Group root = new Group(imageView);
+		Scene scene = new Scene(root);
+
+		stage.setTitle("Mazr");
+		stage.setScene(scene);
+		stage.setResizable(false);
+		stage.sizeToScene();
+		stage.show();
+	}
 }

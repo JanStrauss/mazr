@@ -1,10 +1,12 @@
-package eu.over9000.mazr.prim;
+package eu.over9000.mazr.algorithm;
+
+import java.util.HashSet;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 import eu.over9000.mazr.model.Edge;
 import eu.over9000.mazr.model.Maze;
 import eu.over9000.mazr.model.Node;
-
-import java.util.*;
 
 /**
  * Created by jan on 05.06.15.
