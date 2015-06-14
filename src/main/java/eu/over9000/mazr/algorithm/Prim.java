@@ -1,51 +1,97 @@
 package eu.over9000.mazr.algorithm;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.PriorityQueue;
-import java.util.Set;
-
-import eu.over9000.mazr.model.Edge;
-import eu.over9000.mazr.model.Maze;
-import eu.over9000.mazr.model.Node;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
- * Created by jan on 05.06.15.
+ * Provides a static method to calculate a distance map based on Prim's MST algorithm.
  */
-public class Prim {
-    private Prim(){}
+public final class Prim {
 
-    public static Set<Edge> calculateMinimumSpanningTree(Maze maze){
-        Set<Edge> result= new HashSet<>();
+	public static int[][] calculateDistanceMap(final int width, final int height, final long seed) {
+		final Random random = new Random(seed);
 
-        Set<Node> unspanned = new HashSet<>(maze.getNodes());
+		final int[][] distanceMap = new int[height][width];
 
-            Node root = maze.getStartNode();
-            unspanned.remove(root);
+		for (int i = 0; i < height; i++) {
+			for (int j = 0; j < width; j++) {
+				distanceMap[i][j] = Integer.MAX_VALUE;
+			}
+		}
 
-            PriorityQueue<Edge> dangling = new PriorityQueue<>();
+		final int startX = random.nextInt(width);
+		final int startY = random.nextInt(height);
 
-            dangling.addAll(maze.getEdgesOfNode().get(root));
+		distanceMap[startY][startX] = 0;
 
-            for (Edge minEdge; (minEdge = dangling.poll()) != null; ) {
-                Node source = maze.getEdgeSource(minEdge);
-                Node target = unspanned.contains(source) ? source : maze.getEdgeTarget(minEdge);
+		final PriorityQueue<Edge> dangling = new PriorityQueue<>();
 
-                if (!unspanned.contains(target)) {
-                    continue;
-                }
+		dangling.addAll(getEdgesFor(startY, startX, width, height, random, 0));
 
-                result.add(minEdge);
+		while (!dangling.isEmpty()) {
+			final Edge current = dangling.remove();
 
-                unspanned.remove(target);
+			if (distanceMap[current.targetY][current.targetX] < Integer.MAX_VALUE) {
+				continue;
+			}
 
-                for (Edge edge : maze.getEdgesOfNode().get(target)) {
-                    if (unspanned.contains(maze.getEdgeSource(edge).equals(target) ? maze.getEdgeTarget(edge) : maze.getEdgeSource(edge))) {
-                        dangling.add(edge);
-                    }
-                }
-            }
+			distanceMap[current.targetY][current.targetX] = current.dist;
 
+			final Collection<Edge> outgoingEdges = getEdgesFor(current.targetY, current.targetX, width, height, random, current.dist);
+			final Collection<Edge> unvisitedTargets = outgoingEdges.stream().filter(distEdge -> distanceMap[distEdge.targetY][distEdge.targetX] == Integer.MAX_VALUE).collect(Collectors.toList());
+			dangling.addAll(unvisitedTargets);
+		}
 
-        return result;
-    }
+		return distanceMap;
+
+	}
+
+	private static Collection<Edge> getEdgesFor(final int y, final int x, final int width, final int height, final Random random, final int dist) {
+		final Collection<Edge> result = new ArrayList<>(4);
+
+		final int above = y - 1;
+		final int below = y + 1;
+		final int left = x - 1;
+		final int right = x + 1;
+
+		final int newDist = dist + 1;
+
+		if (above >= 0) {
+			result.add(new Edge(above, x, random.nextFloat(), newDist));
+		}
+		if (below < height) {
+			result.add(new Edge(below, x, random.nextFloat(), newDist));
+		}
+		if (left >= 0) {
+			result.add(new Edge(y, left, random.nextFloat(), newDist));
+		}
+		if (right < width) {
+			result.add(new Edge(y, right, random.nextFloat(), newDist));
+		}
+
+		return result;
+	}
+
+	private static class Edge implements Comparable<Edge> {
+		public final int targetX;
+		public final int targetY;
+		public final float weight;
+		public final int dist;
+
+		public Edge(final int targetY, final int targetX, final float weight, final int dist) {
+			this.targetY = targetY;
+			this.targetX = targetX;
+			this.weight = weight;
+			this.dist = dist;
+		}
+
+		@Override
+		public int compareTo(final Edge other) {
+			return Float.compare(weight, other.weight);
+		}
+	}
+
 }
