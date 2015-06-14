@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  */
 public final class Prim {
 
-	public static int[][] calculateDistanceMap(final int width, final int height, final long seed) {
+	public static int[][] calculateDistanceMap(final int height, final int width, final long seed) {
 		final Random random = new Random(seed);
 
 		final int[][] distanceMap = new int[height][width];
