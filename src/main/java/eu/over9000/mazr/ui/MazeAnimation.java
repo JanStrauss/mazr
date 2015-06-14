@@ -10,11 +10,13 @@ import javafx.util.Duration;
 public class MazeAnimation extends Transition {
 
 	private final ImageView imageView;
-	private final int count;
+	private final WritableImage image;
+
+	private final int maxDistance;
 	private final int[][] distanceMap;
 	private final int width;
 	private final int height;
-	private final WritableImage image;
+
 	private int lastLimit = -1;
 
 	public MazeAnimation(final int height, final int width, final int[][] distanceMap, final double durationMs) {
@@ -27,7 +29,7 @@ public class MazeAnimation extends Transition {
 		updateImage(0);
 
 		this.imageView = new ImageView(image);
-		this.count = findMaxDistance();
+		this.maxDistance = findMaxDistance();
 
 		setCycleCount(1);
 		setCycleDuration(Duration.millis(durationMs));
@@ -41,12 +43,11 @@ public class MazeAnimation extends Transition {
 
 				final int val = distanceMap[y][x];
 
-
 				if (val > newLimit || val <= lastLimit) {
 					continue;
 				}
 
-				image.getPixelWriter().setColor(x, y, Color.hsb(val * 0.25 % 360, 1, 1));
+				image.getPixelWriter().setColor(x, y, Color.hsb(val * 0.33 % 360, 1, 1));
 			}
 		}
 
@@ -68,7 +69,7 @@ public class MazeAnimation extends Transition {
 	}
 
 	protected void interpolate(final double k) {
-		final int newLimit = Math.min((int) Math.floor(k * count), count);
+		final int newLimit = Math.min((int) Math.floor(k * maxDistance), maxDistance);
 		if (newLimit != lastLimit) {
 			updateImage(newLimit);
 		}

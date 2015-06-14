@@ -9,7 +9,7 @@ import eu.over9000.mazr.algorithm.Prim;
 import eu.over9000.mazr.ui.MazeAnimation;
 
 /**
- * Generates the distance map by calling {@link Prim#calculateDistanceMap(int, int, long)} and displays the result as a colored image using JavaFX.
+ * Generates the distance map by calling {@link Prim#calculateDistanceMap(int, int, long)} and displays the result as an animation using JavaFX.
  */
 public class Mazr extends Application {
 
