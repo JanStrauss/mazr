@@ -17,10 +17,6 @@ public class Mazr extends Application {
 		Application.launch(args);
 	}
 
-	private static double scale(final double val, final double srcFrom, final double srcTo, final double dstFrom, final double dstTo) {
-		return ((val - srcFrom) / (srcTo - srcFrom)) * (dstTo - dstFrom) + dstFrom;
-	}
-
 	@Override
 	public void start(final Stage stage) throws Exception {
 		final int height = 720;
