@@ -5,4 +5,4 @@ result:
 ![mazr example](https://i.imgur.com/PCjImaR.jpg "Mazr Example")
 
 animation:
-![mazr animation](https://i.imgur.com/4aCphPg.gifv "Mazr Animation")
+![mazr animation](https://i.imgur.com/4aCphPg.gif "Mazr Animation")
