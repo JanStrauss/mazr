@@ -26,7 +26,7 @@ public class MazeAnimation extends Transition {
 
 		image = new WritableImage(width, height);
 
-		updateImage(0);
+		updateImage(0, 0);
 
 		this.imageView = new ImageView(image);
 		this.maxDistance = findMaxDistance();
@@ -36,18 +36,21 @@ public class MazeAnimation extends Transition {
 		setInterpolator(Interpolator.LINEAR);
 	}
 
-	private void updateImage(final int newLimit) {
+	private void updateImage(final int newLimit, final double k) {
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 
-				final int val = distanceMap[y][x];
+				final int value = distanceMap[y][x];
 
-				if (val > newLimit || val <= lastLimit) {
+				if (value > newLimit || value <= lastLimit) {
 					continue;
 				}
 
-				image.getPixelWriter().setColor(x, y, Color.hsb(val * 0.33 % 360, 1, 1));
+				//final double color = scale(value, 0, maxDistance, 0, 360);
+				//image.getPixelWriter().setColor(x, y, Color.hsb(color, k, 1 - k));
+
+				image.getPixelWriter().setColor(x, y, Color.hsb(value * 0.33 % 360, 1, 1));
 			}
 		}
 
@@ -71,7 +74,7 @@ public class MazeAnimation extends Transition {
 	protected void interpolate(final double k) {
 		final int newLimit = Math.min((int) Math.floor(k * maxDistance), maxDistance);
 		if (newLimit != lastLimit) {
-			updateImage(newLimit);
+			updateImage(newLimit, k);
 		}
 	}
 

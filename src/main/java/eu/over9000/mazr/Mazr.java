@@ -26,9 +26,13 @@ public class Mazr extends Application {
 		final int height = 720;
 		final int width = 1280;
 
-		final int[][] distMap = Prim.calculateDistanceMap(height, width, 1332);
+		final long start = System.currentTimeMillis();
+		final int[][] distMap = Prim.calculateDistanceMap(height, width, 1337);
+		final long duration = System.currentTimeMillis() - start;
+		System.out.println("build distance map in " + duration + "ms");
 
-		final MazeAnimation animation = new MazeAnimation(height, width, distMap, 10_000);
+
+		final MazeAnimation animation = new MazeAnimation(height, width, distMap, 30_000);
 
 		final Group root = new Group(animation.getView());
 		final Scene scene = new Scene(root);

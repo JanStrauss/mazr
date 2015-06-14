@@ -32,15 +32,15 @@ public final class Prim {
 		dangling.addAll(getEdgesFor(startY, startX, width, height, random, 0));
 
 		while (!dangling.isEmpty()) {
-			final Edge current = dangling.remove();
+			final Edge currentEdge = dangling.remove();
 
-			if (distanceMap[current.targetY][current.targetX] < Integer.MAX_VALUE) {
+			if (distanceMap[currentEdge.targetY][currentEdge.targetX] < Integer.MAX_VALUE) {
 				continue;
 			}
 
-			distanceMap[current.targetY][current.targetX] = current.dist;
+			distanceMap[currentEdge.targetY][currentEdge.targetX] = currentEdge.distance;
 
-			final Collection<Edge> outgoingEdges = getEdgesFor(current.targetY, current.targetX, width, height, random, current.dist);
+			final Collection<Edge> outgoingEdges = getEdgesFor(currentEdge.targetY, currentEdge.targetX, width, height, random, currentEdge.distance);
 			final Collection<Edge> unvisitedTargets = outgoingEdges.stream().filter(distEdge -> distanceMap[distEdge.targetY][distEdge.targetX] == Integer.MAX_VALUE).collect(Collectors.toList());
 			dangling.addAll(unvisitedTargets);
 		}
@@ -79,13 +79,13 @@ public final class Prim {
 		public final int targetX;
 		public final int targetY;
 		public final float weight;
-		public final int dist;
+		public final int distance;
 
-		public Edge(final int targetY, final int targetX, final float weight, final int dist) {
+		public Edge(final int targetY, final int targetX, final float weight, final int distance) {
 			this.targetY = targetY;
 			this.targetX = targetX;
 			this.weight = weight;
-			this.dist = dist;
+			this.distance = distance;
 		}
 
 		@Override
