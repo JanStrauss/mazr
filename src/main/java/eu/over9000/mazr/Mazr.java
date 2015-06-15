@@ -13,17 +13,26 @@ import eu.over9000.mazr.ui.MazeAnimation;
  */
 public class Mazr extends Application {
 
+	private static int height = 720;
+	private static int width = 1280;
+	private static long seed = System.currentTimeMillis();
+
 	public static void main(final String[] args) {
+		if (args.length == 3) {
+			width = Integer.parseInt(args[0]);
+			height = Integer.parseInt(args[1]);
+			seed = Long.parseLong(args[2]);
+		}
+
 		Application.launch(args);
 	}
 
 	@Override
 	public void start(final Stage stage) throws Exception {
-		final int height = 720;
-		final int width = 1280;
+
 
 		final long start = System.currentTimeMillis();
-		final int[][] distMap = Prim.calculateDistanceMap(height, width, 1337);
+		final int[][] distMap = Prim.calculateDistanceMap(height, width, seed);
 		final long duration = System.currentTimeMillis() - start;
 		System.out.println("build distance map in " + duration + "ms");
 
@@ -33,14 +42,11 @@ public class Mazr extends Application {
 		final Group root = new Group(animation.getView());
 		final Scene scene = new Scene(root);
 
-
 		stage.setTitle("Mazr");
 		stage.setScene(scene);
 		stage.setResizable(false);
 		stage.sizeToScene();
 		stage.show();
-
 		animation.play();
 	}
-
 }

@@ -7,6 +7,8 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+import eu.over9000.mazr.util.Util;
+
 public class MazeAnimation extends Transition {
 
 	private final ImageView imageView;
@@ -47,10 +49,10 @@ public class MazeAnimation extends Transition {
 					continue;
 				}
 
-				//final double color = scale(value, 0, maxDistance, 0, 360);
-				//image.getPixelWriter().setColor(x, y, Color.hsb(color, k, 1 - k));
+				final double color = Util.scale(value, 0, maxDistance, 0, 360);
+				image.getPixelWriter().setColor(x, y, Color.hsb(color, 1, 1));
 
-				image.getPixelWriter().setColor(x, y, Color.hsb(value * 0.33 % 360, 1, 1));
+				//image.getPixelWriter().setColor(x, y, Color.hsb(value * 0.33 % 360, 1, 1));
 			}
 		}
 
