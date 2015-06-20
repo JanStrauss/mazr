@@ -7,9 +7,7 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
-import eu.over9000.mazr.util.Util;
-
-public class MazeAnimation extends Transition {
+public class MazeFillAnimation extends Transition {
 
 	private final ImageView imageView;
 	private final WritableImage image;
@@ -21,7 +19,7 @@ public class MazeAnimation extends Transition {
 
 	private int lastLimit = -1;
 
-	public MazeAnimation(final int height, final int width, final int[][] distanceMap, final double durationMs) {
+	public MazeFillAnimation(final int height, final int width, final int[][] distanceMap, final double durationMs) {
 		this.distanceMap = distanceMap;
 		this.width = width;
 		this.height = height;
@@ -49,10 +47,10 @@ public class MazeAnimation extends Transition {
 					continue;
 				}
 
-				final double color = Util.scale(value, 0, maxDistance, 0, 360);
-				image.getPixelWriter().setColor(x, y, Color.hsb(color, 1, 1));
+				//final double color = Util.scale(value, 0, maxDistance, 0, 360);
+				//image.getPixelWriter().setColor(x, y, Color.hsb(color, k, 1-k));
 
-				//image.getPixelWriter().setColor(x, y, Color.hsb(value * 0.33 % 360, 1, 1));
+				image.getPixelWriter().setColor(x, y, Color.hsb(value * 0.33 % 360, 1, 1));
 			}
 		}
 
@@ -84,4 +82,7 @@ public class MazeAnimation extends Transition {
 		return imageView;
 	}
 
+	public WritableImage getImage() {
+		return image;
+	}
 }
