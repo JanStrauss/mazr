@@ -1,6 +1,31 @@
+/*
+ * Mazr
+ * Copyright (C) 2015 s1mpl3x
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 package eu.over9000.mazr.ui;
 
-import eu.over9000.mazr.util.Util;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
@@ -10,12 +35,7 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import javafx.util.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import eu.over9000.mazr.util.Util;
 
 
 /**
@@ -28,7 +48,7 @@ public class MazeChangeAnimation extends Transition {
     private final int[][] distanceMap;
     private final int width;
     private final int height;
-    private WritableImage[] aniData = new WritableImage[CYCLE_COUNT];
+    private final WritableImage[] aniData = new WritableImage[CYCLE_COUNT];
 
     public MazeChangeAnimation(ImageView view, int[][] distanceMap, int width, int height) {
         this.view = view;

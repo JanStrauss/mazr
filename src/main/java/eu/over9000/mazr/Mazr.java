@@ -42,8 +42,6 @@ public class Mazr extends Application {
 			height = Integer.parseInt(args[1]);
 			seed = Long.parseLong(args[2]);
 		}
-		// TODO asdasd
-
 		Application.launch(args);
 	}
 
