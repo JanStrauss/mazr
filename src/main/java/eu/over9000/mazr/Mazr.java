@@ -19,28 +19,28 @@
 
 package eu.over9000.mazr;
 
+import eu.over9000.mazr.algorithm.Prim;
+import eu.over9000.mazr.ui.MazeFillAnimation;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
-import eu.over9000.mazr.algorithm.Prim;
-import eu.over9000.mazr.ui.MazeFillAnimation;
-
 /**
  * Generates the distance map by calling {@link Prim#calculateDistanceMap(int, int, long)} and displays the result as an animation using JavaFX.
  */
 public class Mazr extends Application {
-	private static int height = 1080;
 	private static int width = 1920;
-	private static long seed = System.currentTimeMillis();
+	private static int height = 1080;
+	private static long seed = 1337;
 
 	public static void main(final String[] args) {
 		if (args.length == 3) {
 			width = Integer.parseInt(args[0]);
 			height = Integer.parseInt(args[1]);
 			seed = Long.parseLong(args[2]);
+
 		}
 		Application.launch(args);
 	}
@@ -53,7 +53,6 @@ public class Mazr extends Application {
 		final long duration = System.currentTimeMillis() - start;
 		System.out.println("build distance map in " + duration + "ms");
 
-
 		final BorderPane root = new BorderPane();
 		final MazeFillAnimation animation = new MazeFillAnimation(height, width, distMap, 10_000, root);
 		//final MazeChangeAnimation animation2 = new MazeChangeAnimation(animation.getView(),  distMap,width,height);
@@ -65,7 +64,7 @@ public class Mazr extends Application {
 		final Scene scene = new Scene(root, 1280, 720);
 
 		scene.setOnKeyPressed(t -> {
-			KeyCode key = t.getCode();
+			final KeyCode key = t.getCode();
 			if (key == KeyCode.SPACE) {
 				animation.saveToFile();
 			} else if (key == KeyCode.ESCAPE) {
@@ -75,7 +74,6 @@ public class Mazr extends Application {
 			}
 		});
 		stage.setScene(scene);
-		stage.setResizable(false);
 		stage.sizeToScene();
 		stage.show();
 

@@ -19,12 +19,7 @@
 
 package eu.over9000.mazr.ui;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import javax.imageio.ImageIO;
-
+import eu.over9000.mazr.util.Util;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
 import javafx.embed.swing.SwingFXUtils;
@@ -33,6 +28,11 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
+
+import javax.imageio.ImageIO;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class MazeFillAnimation extends Transition {
 
@@ -83,11 +83,23 @@ public class MazeFillAnimation extends Transition {
 					continue;
 				}
 
-				//final double color = Util.scale(value, 0, maxDistance, 0, 360);
-				//image.getPixelWriter().setColor(x, y, Color.hsb(color, k, 1 - k));
+				if (k > 0.75) {
+					break;
 
-				//image.getPixelWriter().setColor(x, y, Color.hsb(value, .5, Util.scale(k, 0, 0.25, 0, 1)));
-				image.getPixelWriter().setColor(x, y, Color.hsb(value * 0.5 * k, 1, 1));
+				}
+
+				final double color = Util.scale(value, 0, maxDistance, 0, 360);
+				final double distColor = Util.scale(k, 0, 1, 0, 360);
+
+				final double var = k * k;
+				final double rav = 1 - var;
+
+
+				//image.getPixelWriter().setColor(x, y, Color.hsb(color, k, 1 - k));
+				//image.getPixelWriter().setColor(x, y, Color.hsb(distColor, k, 1));
+				//image.getPixelWriter().setColor(x, y, Color.hsb(value * 0.25, .5, Util.scale(k * k, 0, 1, 0, 1)));
+				//image.getPixelWriter().setColor(x, y, Color.hsb(value * 0.5 * rav, k, k));
+				image.getPixelWriter().setColor(x, y, Color.hsb(value * 0.05, 1, 1));
 			}
 		}
 

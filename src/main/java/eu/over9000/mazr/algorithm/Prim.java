@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.PriorityQueue;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 /**
  * Provides a static method to calculate a distance map based on Prim's MST algorithm.
@@ -48,7 +47,7 @@ public final class Prim {
 
 		final PriorityQueue<Edge> dangling = new PriorityQueue<>();
 
-		dangling.addAll(getEdgesFor(startY, startX, width, height, random, 0));
+		dangling.addAll(getNeighborEdges(startY, startX, width, height, random, 0));
 
 		while (!dangling.isEmpty()) {
 			final Edge currentEdge = dangling.remove();
@@ -59,16 +58,15 @@ public final class Prim {
 
 			distanceMap[currentEdge.targetY][currentEdge.targetX] = currentEdge.distance;
 
-			final Collection<Edge> outgoingEdges = getEdgesFor(currentEdge.targetY, currentEdge.targetX, width, height, random, currentEdge.distance);
-			final Collection<Edge> unvisitedTargets = outgoingEdges.stream().filter(distEdge -> distanceMap[distEdge.targetY][distEdge.targetX] == Integer.MAX_VALUE).collect(Collectors.toList());
-			dangling.addAll(unvisitedTargets);
+			final Collection<Edge> outgoingEdges = getNeighborEdges(currentEdge.targetY, currentEdge.targetX, width, height, random, currentEdge.distance);
+			outgoingEdges.stream().filter(edge -> distanceMap[edge.targetY][edge.targetX] == Integer.MAX_VALUE).forEach(dangling::add);
+
 		}
 
 		return distanceMap;
-
 	}
 
-	private static Collection<Edge> getEdgesFor(final int y, final int x, final int width, final int height, final Random random, final int dist) {
+	private static Collection<Edge> getNeighborEdges(final int y, final int x, final int width, final int height, final Random random, final int dist) {
 		final Collection<Edge> result = new ArrayList<>(4);
 
 		final int above = y - 1;
