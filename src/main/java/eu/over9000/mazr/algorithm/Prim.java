@@ -52,14 +52,14 @@ public final class Prim {
 		while (!dangling.isEmpty()) {
 			final Edge currentEdge = dangling.remove();
 
-			if (distanceMap[currentEdge.targetY][currentEdge.targetX] < Integer.MAX_VALUE) {
+			if (distanceMap[currentEdge.y][currentEdge.x] < Integer.MAX_VALUE) {
 				continue;
 			}
 
-			distanceMap[currentEdge.targetY][currentEdge.targetX] = currentEdge.distance;
+			distanceMap[currentEdge.y][currentEdge.x] = currentEdge.distance;
 
-			final Collection<Edge> outgoingEdges = getNeighborEdges(currentEdge.targetY, currentEdge.targetX, width, height, random, currentEdge.distance);
-			outgoingEdges.stream().filter(edge -> distanceMap[edge.targetY][edge.targetX] == Integer.MAX_VALUE).forEach(dangling::add);
+			final Collection<Edge> outgoingEdges = getNeighborEdges(currentEdge.y, currentEdge.x, width, height, random, currentEdge.distance);
+			outgoingEdges.stream().filter(edge -> distanceMap[edge.y][edge.x] == Integer.MAX_VALUE).forEach(dangling::add);
 
 		}
 
@@ -77,30 +77,30 @@ public final class Prim {
 		final int newDist = dist + 1;
 
 		if (above >= 0) {
-			result.add(new Edge(above, x, random.nextFloat(), newDist));
+			result.add(new Edge(above, x, random.nextInt(), newDist));
 		}
 		if (below < height) {
-			result.add(new Edge(below, x, random.nextFloat(), newDist));
+			result.add(new Edge(below, x, random.nextInt(), newDist));
 		}
 		if (left >= 0) {
-			result.add(new Edge(y, left, random.nextFloat(), newDist));
+			result.add(new Edge(y, left, random.nextInt(), newDist));
 		}
 		if (right < width) {
-			result.add(new Edge(y, right, random.nextFloat(), newDist));
+			result.add(new Edge(y, right, random.nextInt(), newDist));
 		}
 
 		return result;
 	}
 
 	private static class Edge implements Comparable<Edge> {
-		public final int targetX;
-		public final int targetY;
-		public final float weight;
+		public final int x;
+		public final int y;
+		public final int weight;
 		public final int distance;
 
-		public Edge(final int targetY, final int targetX, final float weight, final int distance) {
-			this.targetY = targetY;
-			this.targetX = targetX;
+		public Edge(final int y, final int x, final int weight, final int distance) {
+			this.y = y;
+			this.x = x;
 			this.weight = weight;
 			this.distance = distance;
 		}
@@ -110,5 +110,4 @@ public final class Prim {
 			return Float.compare(weight, other.weight);
 		}
 	}
-
 }

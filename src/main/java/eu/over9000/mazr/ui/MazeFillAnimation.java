@@ -40,13 +40,15 @@ public class MazeFillAnimation extends Transition {
 	private final WritableImage image;
 
 	private final int maxDistance;
+	private final float limit;
 	private final int[][] distanceMap;
 	private final int width;
 	private final int height;
 
 	private int lastLimit = -1;
 
-	public MazeFillAnimation(final int height, final int width, final int[][] distanceMap, final double durationMs, final BorderPane parent) {
+	public MazeFillAnimation(final int height, final int width, float limit, final int[][] distanceMap, final double durationMs, final BorderPane parent) {
+		this.limit = limit;
 		this.distanceMap = distanceMap;
 		this.width = width;
 		this.height = height;
@@ -61,11 +63,12 @@ public class MazeFillAnimation extends Transition {
 
 		updateImage(0, 0);
 
-		this.imageView = new ImageView(image);
+		imageView = new ImageView(image);
+		imageView.setPreserveRatio(true);
 		imageView.fitWidthProperty().bind(parent.widthProperty());
 		imageView.fitHeightProperty().bind(parent.heightProperty());
 		parent.setCenter(imageView);
-		this.maxDistance = findMaxDistance();
+		maxDistance = findMaxDistance();
 
 		setCycleCount(1);
 		setCycleDuration(Duration.millis(durationMs));
@@ -83,9 +86,8 @@ public class MazeFillAnimation extends Transition {
 					continue;
 				}
 
-				if (k > 0.75) {
+				if (k > limit) {
 					break;
-
 				}
 
 				final double color = Util.scale(value, 0, maxDistance, 0, 360);
